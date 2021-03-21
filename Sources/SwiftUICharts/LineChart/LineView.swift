@@ -10,11 +10,12 @@ import SwiftUI
 
 public struct LineView: View {
     @ObservedObject var data: ChartData
-    public var title: String?
-    public var legend: String?
-    public var style: ChartStyle
-    public var darkModeStyle: ChartStyle
-    public var valueSpecifier:String
+    public var title : String?
+    public var legend : String?
+    public var style : ChartStyle
+    public var darkModeStyle : ChartStyle
+    public var valueSpecifier : String
+    public let animated : Bool
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var showLegend = false
@@ -29,7 +30,8 @@ public struct LineView: View {
                 title: String? = nil,
                 legend: String? = nil,
                 style: ChartStyle = Styles.lineChartStyleOne,
-                valueSpecifier: String? = "%.1f") {
+                valueSpecifier: String? = "%.1f",
+                animated: Bool = false) {
         
         self.data = ChartData(points: data)
         self.title = title
@@ -37,6 +39,7 @@ public struct LineView: View {
         self.style = style
         self.valueSpecifier = valueSpecifier!
         self.darkModeStyle = style.darkModeStyle != nil ? style.darkModeStyle! : Styles.lineViewDarkMode
+        self.animated = animated
     }
     
     public var body: some View {
@@ -59,10 +62,11 @@ public struct LineView: View {
                         Rectangle()
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
                         if(self.showLegend){
+                            let animation = self.animated ? Animation.easeOut(duration: 1).delay(1) : nil
                             Legend(data: self.data,
                                    frame: .constant(reader.frame(in: .local)), hideHorizontalLines: self.$hideHorizontalLines)
                                 .transition(.opacity)
-                                .animation(Animation.easeOut(duration: 1).delay(1))
+                                .animation(animation)
                         }
                         Line(data: self.data,
                              frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
